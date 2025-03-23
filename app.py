@@ -1,5 +1,6 @@
 import os
 import uuid
+import platform
 from flask import Flask, render_template, request, send_file
 from werkzeug.utils import secure_filename
 from pdf2image import convert_from_path
@@ -15,8 +16,9 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
-# مسار Tesseract المناسب لويندوز
-pytesseract.pytesseract.tesseract_cmd = r'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
+# مسار Tesseract المناسب لويندوز فقط
+if platform.system() == "Windows":
+    pytesseract.pytesseract.tesseract_cmd = r'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
 
 ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg'}
 
@@ -88,4 +90,5 @@ def download_file(filename):
     return send_file(filename, as_attachment=True)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 8000))
+    app.run(debug=True, host='0.0.0.0', port=port)
