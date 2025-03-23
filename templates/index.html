@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>منصة تحويل PDF أو صورة إلى نص</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <header class="bg-white shadow mb-8">
+        <div class="max-w-4xl mx-auto px-4 py-6 text-center">
+            <h1 class="text-3xl font-bold text-blue-700">📘 منصة تحويل PDF أو صورة إلى نص</h1>
+            <p class="text-gray-500 text-sm mt-1">بدقة عالية ودعم اللغة العربية</p>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-4">
+        <div class="bg-white shadow-lg rounded-2xl p-6">
+            <form method="post" enctype="multipart/form-data" class="space-y-5">
+                <label class="block text-sm font-medium text-gray-700">اختر ملف PDF أو صورة:</label>
+                <input type="file" name="file" accept=".pdf,.png,.jpg,.jpeg" required class="w-full text-sm text-gray-700 border border-gray-300 rounded px-4 py-2 bg-gray-50 shadow-sm">
+
+                <div>
+                    <label for="lang" class="block text-sm font-medium text-gray-700">اختر لغة النص:</label>
+                    <select name="lang" id="lang" class="mt-1 block w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50">
+                        <option value="ara">🇸🇦 العربية</option>
+                        <option value="eng">🇬🇧 الإنجليزية</option>
+                        <option value="ara+eng" selected>🌐 كلاهما</option>
+                    </select>
+                </div>
+
+                <button type="submit" id="submitBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg shadow-md transition">
+                    رفع وتحويل
+                </button>
+
+                <!-- مؤشر التحميل -->
+                <div id="loadingMsg" class="text-center text-sm text-gray-600 hidden mt-4">
+                    ⏳ جاري استخراج النص... قد يستغرق الأمر بضع ثوانٍ حسب حجم الملف.
+                </div>
+            </form>
+
+            {% if original_name %}
+                <p class="text-sm text-gray-500 mt-4">📎 اسم الملف المرفوع: <span class="font-medium text-gray-700">{{ original_name }}</span></p>
+            {% endif %}
+
+            {% if text %}
+            <div class="mt-8">
+                <h2 class="text-xl font-semibold text-gray-700 mb-2">📝 النص المستخرج:</h2>
+                <textarea id="resultText" rows="15" class="w-full p-4 border border-gray-300 rounded-lg bg-gray-50 text-sm leading-relaxed shadow-inner">{{ text }}</textarea>
+                <div class="flex justify-between items-center mt-4">
+                    <a href="/download/{{ download_link }}" class="text-blue-600 hover:underline font-medium">تحميل النص</a>
+                    <button onclick="copyText()" class="text-sm text-white bg-green-600 px-4 py-2 rounded shadow hover:bg-green-700">نسخ النص</button>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <!-- قسم المميزات -->
+    <section class="bg-gray-100 py-12 mt-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h2 class="text-2xl font-bold text-blue-700 mb-6">✨ أبرز مميزات المنصة</h2>
+            <ul class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700 text-sm md:text-base">
+                <li>✅ دعم كامل للغة العربية والإنجليزية</li>
+                <li>✅ تحويل PDF أو صور بدقة عالية</li>
+                <li>✅ استخراج النصوص من الملفات الممسوحة ضوئيًا</li>
+                <li>✅ واجهة بسيطة وسهلة الاستخدام</li>
+                <li>✅ يدعم ملفات الصور (JPG / PNG)</li>
+                <li>✅ تصميم متجاوب مع الجوال</li>
+                <li>✅ لا حاجة لتسجيل الدخول</li>
+                <li>✅ تحميل النص بنقرة واحدة</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- قسم آراء العملاء -->
+    <section class="bg-white py-12">
+        <div class="max-w-5xl mx-auto px-4 text-center">
+            <h2 class="text-2xl font-bold text-blue-700 mb-10">💬 آراء العملاء</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                {% for review in reviews %}
+                <div class="bg-gray-50 border rounded-xl p-4 shadow-sm text-sm text-gray-700">
+                    <p class="italic mb-2">"{{ review.comment }}"</p>
+                    <div class="text-xs text-gray-500 text-left">– {{ review.name }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <footer class="text-center text-xs text-gray-400 mt-10 mb-4">
+        &copy; 2025 منصة التحويل النصي - جميع الحقوق محفوظة
+    </footer>
+
+    <script>
+        function copyText() {
+            const textarea = document.getElementById("resultText");
+            textarea.select();
+            document.execCommand("copy");
+            alert("✅ تم نسخ النص إلى الحافظة");
+        }
+
+        const form = document.querySelector("form");
+        const loadingMsg = document.getElementById("loadingMsg");
+        const submitBtn = document.getElementById("submitBtn");
+
+        form.addEventListener("submit", function () {
+            loadingMsg.classList.remove("hidden");
+            submitBtn.disabled = true;
+            submitBtn.innerText = "جارٍ المعالجة...";
+        });
+    </script>
+
+</body>
+</html>
